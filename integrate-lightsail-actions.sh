@@ -282,7 +282,8 @@ echo "3) Node.js (Express, Next.js, etc.)"
 echo "4) Python (Flask, Django, FastAPI)"
 echo "5) React (Create React App, Vite, etc.)"
 echo "6) Docker (Multi-container with Docker Compose)"
-read -p "Enter choice (1-6): " APP_TYPE_CHOICE
+echo "7) Generic (Custom application type)"
+read -p "Enter choice (1-7): " APP_TYPE_CHOICE
 
 case $APP_TYPE_CHOICE in
     1) APP_TYPE="lamp"; APP_TYPE_NAME="LAMP Stack";;
@@ -290,7 +291,8 @@ case $APP_TYPE_CHOICE in
     3) APP_TYPE="nodejs"; APP_TYPE_NAME="Node.js";;
     4) APP_TYPE="python"; APP_TYPE_NAME="Python";;
     5) APP_TYPE="react"; APP_TYPE_NAME="React";;
-    6) APP_TYPE="docker"; APP_TYPE_NAME="Docker"
+    6) APP_TYPE="docker"; APP_TYPE_NAME="Docker";;
+    7) APP_TYPE="generic"; APP_TYPE_NAME="Generic Application"
        echo ""
        echo -e "${YELLOW}Note: With Docker, all services run in containers (no direct installs on host)${NC}"
        ;;
@@ -527,7 +529,7 @@ else
     
     # Download Python modules with error handling
     echo "  Downloading Python deployment modules..."
-    local failed_downloads=()
+    failed_downloads=()
     for file in config_loader.py dependency_manager.py deploy-pre-steps-generic.py deploy-post-steps-generic.py deploy-post-steps-universal.py deployment_monitor.py lightsail_common.py lightsail_rds.py lightsail_bucket.py view_command_log.py os_detector.py; do
         if ! curl -sL "$REPO_URL/workflows/$file" -o "workflows/$file"; then
             failed_downloads+=("$file")
@@ -832,6 +834,14 @@ monitoring:
 EOF
 
 echo "  ✓ Created deployment-${APP_TYPE}.config.yml"
+
+# Create generic config file if it doesn't exist (for compatibility)
+if [[ ! -f "deployment-generic.config.yml" ]]; then
+    if [[ "$APP_TYPE" == "nodejs" ]] || [[ "$APP_TYPE" == "generic" ]]; then
+        cp "deployment-${APP_TYPE}.config.yml" "deployment-generic.config.yml"
+        echo "  ✓ Created deployment-generic.config.yml (copy of ${APP_TYPE} config)"
+    fi
+fi
 
 # Create GitHub Actions workflow
 echo "Creating GitHub Actions workflow..."
@@ -1163,6 +1173,7 @@ EOF
         
         echo "✓ OIDC setup complete"
         echo ""
+    fi
     fi
 fi
 
