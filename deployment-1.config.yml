@@ -1,43 +1,38 @@
-# Node.js User Service API Deployment Configuration
+# 1 Application Deployment Configuration
 
 aws:
   region: us-east-1
 
 lightsail:
-  instance_name: user-service-api
+  instance_name: 1-app-1765529291
   static_ip: ""
   
   # Instance size configuration (optional)
   # If not specified, defaults are: small_3_0 (2GB) for traditional apps, medium_3_0 (4GB) for Docker apps
-  bundle_id: "small_3_0"
+  bundle_id: "2"
   
   # Operating system blueprint configuration (optional)
   # If not specified, defaults to ubuntu_22_04
-  blueprint_id: "ubuntu_22_04"
+  blueprint_id: "1"
 
 application:
-  name: User Service API
+  name: 1 application
   version: "1.0.0"
-  type: nodejs
+  type: 1
   
   package_files:
-    - "server.js"
-    - "package.json"
-    - "package-lock.json"
-    - ".env"
-    - "README.md"
+    - "example-1-app/"
   
   package_fallback: true
   
   environment_variables:
-    NODE_ENV: production
-    PORT: 3000
+    APP_ENV: production
     # Database Configuration
-    DB_TYPE: postgresql
+    DB_TYPE: 3
     DB_HOST: localhost
-    DB_NAME: user_service_db
-    DB_USER: user_service_user
-    DB_PASSWORD: UserService2024!SecurePass
+    DB_NAME: app_db
+    DB_USER: app_user
+    DB_PASSWORD: CHANGE_ME_secure_password_123
 
 dependencies:
   # Database Dependencies
@@ -52,14 +47,14 @@ dependencies:
       user_password: "CHANGE_ME_secure_password_123"
   
   postgresql:
-    enabled: true
+    enabled: false
     external: false
     config:
       version: "13"
-      postgres_password: "PostgresAdmin2024!SecurePass"
-      create_database: "user_service_db"
-      create_user: "user_service_user"
-      user_password: "UserService2024!SecurePass"
+      postgres_password: "CHANGE_ME_postgres_password_123"
+      create_database: "app_db"
+      create_user: "app_user"
+      user_password: "CHANGE_ME_secure_password_123"
   
   git:
     enabled: true
@@ -115,8 +110,7 @@ deployment:
       health_check: true
       external_connectivity: true
       endpoints_to_test:
-        - "/health"
-        - "/api/users"
+        - "/"
 
 github_actions:
   triggers:
@@ -141,8 +135,8 @@ github_actions:
 
 monitoring:
   health_check:
-    endpoint: "/health"
-    expected_content: "OK"
+    endpoint: "/"
+    expected_content: "1 Application"
     max_attempts: 15
     wait_between_attempts: 20
     initial_wait: 60
@@ -156,4 +150,4 @@ security:
 backup:
   enabled: true
   retention_days: 7
-  backup_location: "/var/backups/user-service-deployments"
+  backup_location: "/var/backups/1 application-deployments"
